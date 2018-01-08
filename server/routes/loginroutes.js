@@ -16,13 +16,13 @@ connection.connect(function (err) {
     }
 });
 
+
+////register
 exports.register = function (req, res) {
-    // console.log("req",req.body);
+     //console.log("req",req.body);
     var today = new Date();
     var generateHash = function (password) {
-
         return bCrypt.hashSync(password, bCrypt.genSaltSync(8), null);
-
     };
     var users = {
         "first_name": req.body.first_name,
@@ -32,23 +32,37 @@ exports.register = function (req, res) {
         "created": today,
         "modified": today
     }
-
-    connection.query('INSERT INTO users SET ?', users, function (error, results, fields) {
-        if (error) {
-            console.log("error ocurred", error);
+    connection.query('SELECT count(1) as sayi FROM users WHERE email = ?', req.body.email, function (error, results, fields) { 
+        var sayi=results[0].sayi;
+        console.log("count ="+ sayi);
+        if (sayi >0) {
+            console.log("email has already taken", error);
+            console.log(results.length);
+            res.send({
+                "code": 300,
+                "msg": "email has already taken"
+            })
+        } else {
+    connection.query('INSERT INTO users SET ?', users, function (error2, results, fields) {
+        if (error2) {
+            console.log("error ocurred", error2);
             res.send({
                 "code": 400,
-                "failed": "error ocurred"
+                "msg": "error ocurred"
             })
         } else {
             console.log('The solution is: ', results);
             res.send({
                 "code": 200,
-                "success": "user registered sucessfully"
+                "msg": "user registered sucessfully"
             });
         }
     });
 }
+});
+}
+
+/////login
 exports.login = function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
@@ -105,6 +119,7 @@ exports.login = function (req, res) {
 
 }
 
+///protected
 exports.protected = function (req, res) {
     console.log("girdi");
     var clientId = req.body.clientId;
@@ -123,4 +138,35 @@ exports.protected = function (req, res) {
             "success": "User has not logged in"
         });
     }
+}
+
+////step2
+exports.step2 = function (req, res) {
+    //console.log("req",req.body);
+   var users = {
+       "first_name": req.body.first_name,
+       "last_name": req.body.last_name,
+       "email": req.body.email,
+       "password": generateHash(req.body.password),
+       "created": today,
+       "modified": today
+   }
+
+   connection.query('update users SET ?', users, function (error2, results, fields) {
+       if (error2) {
+           console.log("error ocurred", error2);
+           res.send({
+               "code": 400,
+               "msg": "error ocurred"
+           })
+       } else {
+           console.log('The solution is: ', results);
+           res.send({
+               "code": 200,
+               "msg": "user registered sucessfully"
+           });
+       }
+   });
+}
+});
 }

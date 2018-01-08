@@ -68,6 +68,6 @@ passport.use('jwt', new JwtStrategy(options, function (jwt_payload, done) {
 router.post('/register', login.register);
 router.post('/login', login.login);
 router.post('/protected', login.protected);
-
+router.post('/step2', login.step2);
 app.use('/api', router);
 app.listen(5000);

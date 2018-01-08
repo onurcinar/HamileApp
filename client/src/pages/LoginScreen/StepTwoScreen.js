@@ -27,13 +27,92 @@ export default class StepTwo extends React.Component {
             date:null,
             rBackgroundColor:'blue',
             bBackgroundColor: 'grey',
-            bText:'Son Regle Tarihi'
+            bText:'Son Regle Tarihi',
+            bDate:null,
+            wState:null,
+            eState:null,
+            rDate:null
         }
     }
     static navigationOptions = {
         header: null
     };
 
+    validate(bDate,wState,eState,rDate){
+        if(bDate ==null) 
+        {
+           alert('Lütfen Doğum Tarihi Giriniz..');
+          // this.refs.dpBDate.focus();
+           return false;
+        }
+        if(wState ==null) 
+        {
+           alert('Lütfen Çalışma Durumunu Giriniz..');
+       //    this.refs.drpWState.focus();
+           return false;
+        }
+        if(eState ==null) 
+        {
+           alert('Lütfen Öğrenim Durumunu Giriniz..');
+          // this.refs.drpEState.focus();
+           return false;
+        }
+        if(rDate ==null) 
+        {
+           alert('Lütfen Regle / Beklenen Doğum Tarihi Giriniz..');
+          // this.refs.dpRDate.focus();
+           return false;
+        }
+        return true;
+    }
+    submit = async () => {
+        var bDate=this.state.bDate;
+        var wState=this.state.wState;
+        var eState=this.state.eState;
+        var rDate=this.state.rDate;
+        var email = await AsyncStorage.getItem('@HamAppStore:email');
+       // alert('bdate ='+bDate+ ', wState ='+ wState+ ', eState ='+eState+', rDate ='+rDate);
+        var result=this.validate(bDate,wState,eState,rDate);
+       // alert('result ='+result);
+       if(!result) return;
+       const { navigate } = this.props.navigation;
+          const data = {
+            email:email,
+            bDate: bDate,
+            wState: wState,
+            eState: eState,
+            rDate: rDate
+          }
+          // Serialize and post the data
+          const json = JSON.stringify(data);
+         fetch('http://10.6.26.116:5000/api/step2', {
+          //fetch('http://192.168.2.103:5000/api/step2', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: json
+          })
+            .then((response) => response.json())
+            .then(async (res) => {
+                var code=res.code;
+                var result=res.msg;
+                if(code!=200)
+                {
+                    alert(result);
+                    return;
+                }
+              alert('Success! You may now log in.');
+              // Redirect to home screen
+              navigate("StepThree");
+              //this.props.navigation.navigate.navigate("StepTwo");
+            })
+            .catch((error) => {
+              alert('There was an error creating your account.' + error);
+            })
+            .done()
+    }
     setBirthDate(value)
     {
         this.setState({
@@ -45,7 +124,7 @@ export default class StepTwo extends React.Component {
 
     render() {
         let winSize = Dimensions.get('window');
-        console.log(`width = ${winSize.width}`);
+        //console.log(`width = ${winSize.width}`);
         let cData = [{
             value: 'Çalışıyor',
         }, {
@@ -83,8 +162,9 @@ export default class StepTwo extends React.Component {
                         <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-start', width: winSize.width - 60, }}>
                             <DatePicker
                                 style={{ width: winSize.width-50 }}
-                                date={this.state.date}
+                                date={this.state.bDate}
                                 mode="date"
+                                ref='dpBDate'
                                 placeholder="Doğum Tarihi"
                                 format="DD-MM-YYYY"
                                 minDate="01-01-1950"
@@ -102,15 +182,21 @@ export default class StepTwo extends React.Component {
                                         marginRight: 36
                                     }
                                 }}
-                                onDateChange={(date) => { this.setState({ date: date }) }}
+                                onDateChange={(bDate) => { this.setState({ bDate: bDate }) }}
                             />
                             <Dropdown style={{height:30}}
                                 label='Çalışma Durumu'
                                 data={cData}
+                                ref='drpWDate'
+                                //value={this.state.wState}
+                                onChangeText={(wState) => this.setState({ wState })}
                             />
                             <Dropdown style={{ height: 30 }}
                                 label='Öğrenim Durumu'
                                 data={oData}
+                                ref='drpEDate'
+                                //value={this.state.eState}
+                                onChangeText={(eState) => this.setState({ eState })}
                             />
                             <View style={{flex:1,flexDirection:'row', marginTop:20}}>
                                 <TouchableHighlight style={{ flex:1 }} underlayColor="white" onPress={()=>this.setBirthDate(1)} >
@@ -126,7 +212,8 @@ export default class StepTwo extends React.Component {
                              </View>
                             <DatePicker
                                 style={{ width: winSize.width - 50, marginTop:10 }}
-                                date={this.state.date}
+                                date={this.state.rDate}
+                                ref='dpRDate'
                                 mode="date"
                                 placeholder={this.state.bText}
                                 format="DD-MM-YYYY"
@@ -145,12 +232,12 @@ export default class StepTwo extends React.Component {
                                         marginRight: 36
                                     }
                                 }}
-                                onDateChange={(date) => { this.setState({ date: date }) }}
+                               onDateChange={(rDate) => { this.setState({ rDate: rDate }) }}
                             />
                         </View>
                         <Button full rounded primary
                             style={{ marginTop: 30, width: 70, alignSelf: 'center' }}
-                            onPress={() => this.props.navigation.navigate("StepThree")}>
+                            onPress={this.submit.bind(this)}>
                             <Text>Devam Et</Text>
                         </Button>
 

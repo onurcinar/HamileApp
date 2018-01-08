@@ -44,7 +44,7 @@ export default class StepTwo extends React.Component {
 
     render() {
         let winSize = Dimensions.get('window');
-        console.log(`width = ${winSize.width}`);
+        //console.log(`width = ${winSize.width}`);
         let cData = [{
             value: 'Erkek',
         }, {

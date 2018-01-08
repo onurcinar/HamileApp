@@ -109,7 +109,7 @@ export default class FormTest2 extends React.Component {
     }
     render() {
         let winSize = Dimensions.get('window');
-        console.log(`width = ${winSize.width}`);
+       // console.log(`width = ${winSize.width}`);
         return (
             <LinearGradient
                 colors={['#f6d1cc', '#d8ddee']}

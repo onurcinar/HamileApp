@@ -6,7 +6,7 @@ import StepThree from "./StepThreeScreen.js";
 import test from "../Auth/views/LoginView.js";
 import { StackNavigator } from "react-navigation";
 export default (DrawNav = StackNavigator({
-  Login: { screen: Login },
+  Login: { screen: StepTwo },
   SignUp: { screen: SignUp },
   StepTwo: { screen: StepTwo },
   StepThree: { screen: StepThree }

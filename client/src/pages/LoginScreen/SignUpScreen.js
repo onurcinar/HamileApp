@@ -7,6 +7,7 @@ import {
     TextInput,
     Text,
     ScrollView,
+    AsyncStorage,
     ImageBackground,
     TouchableHighlight,
     Dimensions
@@ -93,8 +94,9 @@ export default class SignUp extends React.Component {
         var passRep=this.state.passwordRep;
 
       var result= this.validate(name,surName,email,pass,passRep);
+      //alert('result ='+result);
       if(!result) return;
-        //alert('girdi');
+       // alert('girdi');
        // const value = this.refs.form.getValue();
         const { navigate } = this.props.navigation;
           const data = {
@@ -105,8 +107,8 @@ export default class SignUp extends React.Component {
           }
           // Serialize and post the data
           const json = JSON.stringify(data);
-         // fetch('http://192.168.2.103:3000/users/register', {
-          fetch('http://192.168.2.103:5000/api/register', {
+         fetch('http://10.6.26.116:5000/api/register', {
+          //fetch('http://192.168.2.103:5000/api/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -115,8 +117,21 @@ export default class SignUp extends React.Component {
             body: json
           })
             .then((response) => response.json())
-            .then(() => {
+            .then(async (res) => {
+                var code=res.code;
+                var result=res.msg;
+                if(code!=200)
+                {
+                    alert(result);
+                    return;
+                }
               alert('Success! You may now log in.');
+              try {
+                await AsyncStorage.setItem('@HamAppStore:email', email.toString());
+              } catch (error) {
+                // Error saving data
+                alert('Set Item error = '+ error);
+              }
               // Redirect to home screen
               navigate("StepTwo");
               //this.props.navigation.navigate.navigate("StepTwo");
@@ -130,7 +145,7 @@ export default class SignUp extends React.Component {
 
     render() {
         let winSize = Dimensions.get('window');
-        console.log(`width = ${winSize.width}`);
+       // console.log(`width = ${winSize.width}`);
         return (
             <LinearGradient
                 colors={['#f6d1cc', '#d8ddee']}
