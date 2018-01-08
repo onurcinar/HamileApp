@@ -21,25 +21,64 @@ export default class SignUp extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            showMail: true,
-            showText: 'Göster'
+            name:null,
+            surName:null,
+            email:null,
+            password:null,
+            passwordRep:null
         }
     }
     static navigationOptions = {
         header: null
     };
-    press() {
-        Alert.alert('You tapped the button!')
+
+    validate(name,surname,email,pass,passRep){
+        alert('name ='+name+ ', surname ='+surname+', email ='+email+', pass ='+pass+', passREp ='+passRep);
     }
+
     submit() {
-        this.setState({ showForm: !this.state.showForm });
-    }
-    showPassword() {
-        this.setState({
-            showMail: !this.state.showMail,
-            showText: this.state.showMail ? 'Gizle' : 'Göster'
-        });
-    }
+        var name=this.state.name;
+        var surName=this.state.surName;
+        var email=this.state.email;
+        var pass=this.state.password;
+        var passRep=this.state.passwordRep;
+
+        validate(name,surName,email,pass,passRep);
+return;
+alert('girdi');
+       // const value = this.refs.form.getValue();
+        //const { navigate } = this.props.navigation;
+          const data = {
+            first_name: name,
+            last_name: surName,
+            email: email,
+            password: pass,
+          }
+          // Serialize and post the data
+          const json = JSON.stringify(data);
+         // fetch('http://192.168.2.103:3000/users/register', {
+          fetch('http://192.168.2.103:5000/api/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: json
+          })
+            .then((response) => response.json())
+            .then(() => {
+              alert('Success! You may now log in.');
+              // Redirect to home screen
+              //navigate("HomeView");
+              this.props.navigation.navigate.navigate("StepTwo");
+            })
+            .catch((error) => {
+              alert('There was an error creating your account.' + error);
+            })
+            .done()
+        } 
+      
+
     render() {
         let winSize = Dimensions.get('window');
         console.log(`width = ${winSize.width}`);
@@ -58,18 +97,35 @@ export default class SignUp extends React.Component {
                              Hamilelik sürecinize dair her şeyi bir uygulama ile takip edin... 
                          </Text>
                         <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-start', width: winSize.width - 60,}}>
-                        <TextInput underlineColorAndroid={'transparent'} placeholder="Ad - Soyad" 
+                        <TextInput ref='txtName' keyboardType={'default'}
+                                onChangeText={(name) => this.setState({ name })}
+                                value={this.state.name}
+                         underlineColorAndroid={'transparent'} placeholder="Ad" 
                             style={styles.textInput} />
-                        <TextInput underlineColorAndroid={'transparent'} placeholder="E-Posta"
+                        <TextInput ref='txSurName' keyboardType={'default'}
+                                onChangeText={(surName) => this.setState({ surName })}
+                                value={this.state.surName}
+                         underlineColorAndroid={'transparent'} placeholder="Soyad" 
                             style={styles.textInput} />
-                        <TextInput underlineColorAndroid={'transparent'} password={true} secureTextEntry={true} placeholder="Şifre"
+                        <TextInput ref='txtEmail' keyboardType={'email-address'}
+                                onChangeText={(email) => this.setState({ email })}
+                                value={this.state.email}
+                         underlineColorAndroid={'transparent'} placeholder="E-Posta"
                             style={styles.textInput} />
-                            <TextInput underlineColorAndroid={'transparent'} password={true} secureTextEntry={true} placeholder="Şifre Tekrar"
+                        <TextInput ref='txtPass' keyboardType={'default'}
+                                onChangeText={(password) => this.setState({ password })}
+                                value={this.state.password}
+                         underlineColorAndroid={'transparent'} password={true} secureTextEntry={true} placeholder="Şifre"
+                            style={styles.textInput} />
+                        <TextInput ref='txtPassRep' keyboardType={'default'}
+                                onChangeText={(passwordRep) => this.setState({ passwordRep })}
+                                value={this.state.passwordRep}
+                         underlineColorAndroid={'transparent'} password={true} secureTextEntry={true} placeholder="Şifre Tekrar"
                             style={styles.textInput} />
                         </View>
                         <Button full rounded primary
                             style={{ marginTop: 30, width: 60, alignSelf: 'center' }}
-                            onPress={() => this.props.navigation.navigate("StepTwo")}>
+                           onPress={this.submit.bind(this)}>
                             <Text>Kayıt Ol</Text>
                         </Button>
 
