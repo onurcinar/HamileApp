@@ -19,6 +19,7 @@ import DatePicker from 'react-native-datepicker';
 import { Dropdown } from 'react-native-material-dropdown';
 //import Icon from '@expo/vector-icons/FontAwesome';
 import Icon from '@expo/vector-icons/Entypo';
+import  KeyboardSpacer from 'react-native-keyboard-spacer';
 export default class StepTwo extends React.Component {
     constructor(props) {
         super(props)

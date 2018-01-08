@@ -17,6 +17,7 @@ import { Button } from "native-base";
 import Label from '../../components/Label';
 //import Icon from '@expo/vector-icons/FontAwesome';
 import Icon from '@expo/vector-icons/Entypo';
+import  KeyboardSpacer from 'react-native-keyboard-spacer';
 export default class SignUp extends React.Component {
     constructor(props) {
         super(props)
@@ -33,7 +34,55 @@ export default class SignUp extends React.Component {
     };
 
     validate(name,surname,email,pass,passRep){
-        alert('name ='+name+ ', surname ='+surname+', email ='+email+', pass ='+pass+', passREp ='+passRep);
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if(name ==null || name=='') 
+        {
+           alert('Lütfen Bir Ad Giriniz..');
+           this.refs.txtName.focus();
+           return false;
+        }
+        if(surname ==null || surname=='') 
+        {
+           alert('Lütfen Bir SoyAd Giriniz..');
+           this.refs.txtSurName.focus();
+           return false;
+        }
+        if(email ==null || email=='') 
+        {
+           alert('Lütfen Bir Email Giriniz..');
+           this.refs.txtEmail.focus();
+           return false;
+        }
+        if (!reg.test(email)) {
+            alert("Email is Not Correct");
+            this.refs.txtEmail.focus();
+            return false;
+        }
+        if(pass ==null || pass=='') 
+        {
+           alert('Lütfen şifre Giriniz..');
+           this.refs.txtPass.focus();
+           return false;
+        }
+        if(pass.length<4 ||pass.length>8 )
+        {
+             alert("Sifre 4 ile 8 karakter arasında olmalıdır");
+             this.refs.txtPass.focus();
+             return false;
+        }
+        if(passRep ==null || passRep=='') 
+        {
+           alert('Lütfen şifre tekrar Giriniz..');
+           this.refs.txtPassRep.focus();
+           return false;
+        }
+        if(passRep !=pass) 
+        {
+           alert('Şifre Tekrarını yanlış girdiniz..');
+           this.refs.txtPassRep.focus();
+           return false;
+        }
+        return true;
     }
 
     submit() {
@@ -43,11 +92,11 @@ export default class SignUp extends React.Component {
         var pass=this.state.password;
         var passRep=this.state.passwordRep;
 
-        validate(name,surName,email,pass,passRep);
-return;
-alert('girdi');
+      var result= this.validate(name,surName,email,pass,passRep);
+      if(!result) return;
+        //alert('girdi');
        // const value = this.refs.form.getValue();
-        //const { navigate } = this.props.navigation;
+        const { navigate } = this.props.navigation;
           const data = {
             first_name: name,
             last_name: surName,
@@ -69,8 +118,8 @@ alert('girdi');
             .then(() => {
               alert('Success! You may now log in.');
               // Redirect to home screen
-              //navigate("HomeView");
-              this.props.navigation.navigate.navigate("StepTwo");
+              navigate("StepTwo");
+              //this.props.navigation.navigate.navigate("StepTwo");
             })
             .catch((error) => {
               alert('There was an error creating your account.' + error);
@@ -102,7 +151,7 @@ alert('girdi');
                                 value={this.state.name}
                          underlineColorAndroid={'transparent'} placeholder="Ad" 
                             style={styles.textInput} />
-                        <TextInput ref='txSurName' keyboardType={'default'}
+                        <TextInput ref='txtSurName' keyboardType={'default'}
                                 onChangeText={(surName) => this.setState({ surName })}
                                 value={this.state.surName}
                          underlineColorAndroid={'transparent'} placeholder="Soyad" 
@@ -130,7 +179,7 @@ alert('girdi');
                         </Button>
 
                     </View>
-
+                    <KeyboardSpacer />
                 </ScrollView>
             </LinearGradient>
 
