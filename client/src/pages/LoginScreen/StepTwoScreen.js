@@ -9,7 +9,10 @@ import {
     ScrollView,
     ImageBackground,
     TouchableHighlight,
-    Dimensions
+    Dimensions,
+    AsyncStorage,
+    Picker,
+    ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo';
 import Container from '../../components/Container';
@@ -20,10 +23,13 @@ import { Dropdown } from 'react-native-material-dropdown';
 //import Icon from '@expo/vector-icons/FontAwesome';
 import Icon from '@expo/vector-icons/Entypo';
 import  KeyboardSpacer from 'react-native-keyboard-spacer';
+//import { worker } from 'cluster';
+var PickerItem = Picker.Item;
 export default class StepTwo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            isLoading: true,
             date:null,
             rBackgroundColor:'blue',
             bBackgroundColor: 'grey',
@@ -31,13 +37,56 @@ export default class StepTwo extends React.Component {
             bDate:null,
             wState:null,
             eState:null,
-            rDate:null
+            rDate:null,
+            userTypes: [{userType: 'admin', userName: 'Admin User'}, {userType: 'employee', userName: 'Employee User'}, {userType: 'dev', userName: 'Developer User'}],
+            selectedUserType: '',
+            language:null,
+           // dsWorkStates: [{"id":2,"name":"Çalışıyor"},{"id":3,"name":"İşsiz"},{"id":4,"name":"Kararsız"}],
+         //   selectedWorkState: {"id":2,"name":"Çalışıyor"}
         }
     }
+
+    componentDidMount() {
+        return fetch('http://192.168.2.104:5000/api/getWorkStates', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            }
+          })
+          .then((response) => response.json())
+          .then((responseJson) => {
+            this.setState({
+              isLoading: false,
+              dsWorkStates: responseJson.results,
+              selectedWorkState:responseJson.results[0]
+            }, function() {
+               // alert('key ='+accounts);
+              // do something with new state
+             //alert('result ='+ this.state.dsWorkStates[0].name);
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+         
+      }
+
+     loadWorkStates() {
+      return this.state.dsWorkStates.map(workState => (
+          <Picker.Item key={workState.id} label={workState.name} value={workState.id} />
+       ))
+      }
     static navigationOptions = {
         header: null
     };
 
+    loadUserTypes() {
+        return this.state.userTypes.map(user => (
+           <Picker.Item key='1' label={user.userName} value={user.userType} />
+        ))
+      }
+      
     validate(bDate,wState,eState,rDate){
         if(bDate ==null) 
         {
@@ -65,15 +114,19 @@ export default class StepTwo extends React.Component {
         }
         return true;
     }
+
     submit = async () => {
         var bDate=this.state.bDate;
         var wState=this.state.wState;
         var eState=this.state.eState;
         var rDate=this.state.rDate;
         var email = await AsyncStorage.getItem('@HamAppStore:email');
+var lang=this.state.language;
+        alert('lang ='+lang+', ID='+langId);
+        return;
        // alert('bdate ='+bDate+ ', wState ='+ wState+ ', eState ='+eState+', rDate ='+rDate);
         var result=this.validate(bDate,wState,eState,rDate);
-       // alert('result ='+result);
+        //alert('result ='+result);
        if(!result) return;
        const { navigate } = this.props.navigation;
           const data = {
@@ -85,8 +138,8 @@ export default class StepTwo extends React.Component {
           }
           // Serialize and post the data
           const json = JSON.stringify(data);
-         fetch('http://10.6.26.116:5000/api/step2', {
-          //fetch('http://192.168.2.103:5000/api/step2', {
+        // fetch('http://10.6.26.116:5000/api/step2', {
+          fetch('http://192.168.2.104:5000/api/step2', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -123,8 +176,23 @@ export default class StepTwo extends React.Component {
     }
 
     render() {
+        if (this.state.isLoading) {
+            return (
+              <View style={{flex: 1, paddingTop: 20}}>
+                <ActivityIndicator />
+              </View>
+            );
+          }
         let winSize = Dimensions.get('window');
         //console.log(`width = ${winSize.width}`);
+        const workStateItems = []; 
+      //  for (var i = 0; i < this.state.dsWorkStates.length; i++) 
+       // { 
+         //   s = this.state.dsWorkStates[i]; 
+          //  alert('work state ='+s);
+           // workStateItems.push(<Picker.Item value={s} label={s} />);
+       //  }
+
         let cData = [{
             value: 'Çalışıyor',
         }, {
@@ -166,9 +234,9 @@ export default class StepTwo extends React.Component {
                                 mode="date"
                                 ref='dpBDate'
                                 placeholder="Doğum Tarihi"
-                                format="DD-MM-YYYY"
-                                minDate="01-01-1950"
-                                maxDate="31-12-2100"
+                                format="YYYY-MM-DD"
+                                minDate="1950-01-01"
+                                maxDate="2100-12-31"
                                 confirmBtnText="Confirm"
                                 cancelBtnText="Cancel"
                                 customStyles={{
@@ -184,17 +252,29 @@ export default class StepTwo extends React.Component {
                                 }}
                                 onDateChange={(bDate) => { this.setState({ bDate: bDate }) }}
                             />
-                            <Dropdown style={{height:30}}
+                            <Picker 
+                            selectedValue={this.state.language}
+                            onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
+                            {/* <Picker.Item label="Java" value="1" />
+                            <Picker.Item label="JavaScript" value="2" /> */}
+                            {this.loadUserTypes()}
+                            </Picker>
+                            <Picker
+                                selectedValue={this.state.selectedWorkState}
+                                onValueChange={ (workState) => ( this.setState({selectedWorkState:workState}) ) } >
+                                  {this.loadWorkStates()}
+                            </Picker>
+                             <Dropdown style={{height:30}}
                                 label='Çalışma Durumu'
                                 data={cData}
-                                ref='drpWDate'
-                                //value={this.state.wState}
+                                ref='drpWState'
+                                //value={wState}
                                 onChangeText={(wState) => this.setState({ wState })}
-                            />
+                            /> 
                             <Dropdown style={{ height: 30 }}
                                 label='Öğrenim Durumu'
                                 data={oData}
-                                ref='drpEDate'
+                                ref='drpEState'
                                 //value={this.state.eState}
                                 onChangeText={(eState) => this.setState({ eState })}
                             />
@@ -216,9 +296,9 @@ export default class StepTwo extends React.Component {
                                 ref='dpRDate'
                                 mode="date"
                                 placeholder={this.state.bText}
-                                format="DD-MM-YYYY"
-                                minDate="01-01-1950"
-                                maxDate="31-12-2100"
+                                format="YYYY-MM-DD"
+                                minDate="1950-01-01"
+                                maxDate="2100-12-31"
                                 confirmBtnText="Confirm"
                                 cancelBtnText="Cancel"
                                 customStyles={{
@@ -273,4 +353,3 @@ const styles = StyleSheet.create({
         marginTop: 20
     }
 });
-

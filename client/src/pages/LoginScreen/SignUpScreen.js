@@ -107,8 +107,8 @@ export default class SignUp extends React.Component {
           }
           // Serialize and post the data
           const json = JSON.stringify(data);
-         fetch('http://10.6.26.116:5000/api/register', {
-          //fetch('http://192.168.2.103:5000/api/register', {
+         //fetch('http://10.6.26.116:5000/api/register', {
+          fetch('http://192.168.2.104:5000/api/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

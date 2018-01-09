@@ -143,30 +143,23 @@ exports.protected = function (req, res) {
 ////step2
 exports.step2 = function (req, res) {
     //console.log("req",req.body);
-   var users = {
-       "first_name": req.body.first_name,
-       "last_name": req.body.last_name,
-       "email": req.body.email,
-       "password": generateHash(req.body.password),
-       "created": today,
-       "modified": today
-   }
 
-   connection.query('update users SET ?', users, function (error2, results, fields) {
-       if (error2) {
-           console.log("error ocurred", error2);
+   var sql = "UPDATE users SET bDate = "+req.body.bDate+", wState='"+req.body.wState+"', eState='"+req.body.eState+"', rDate="+req.body.rDate+" WHERE email = '"+req.body.email+"'";
+  console.log(sql);
+   connection.query(sql, function (err, result) {
+       if (err) {
+           console.log("error ocurred", err);
            res.send({
                "code": 400,
                "msg": "error ocurred"
            })
        } else {
-           console.log('The solution is: ', results);
+        console.log(result.affectedRows + " record(s) updated");
            res.send({
                "code": 200,
-               "msg": "user registered sucessfully"
+               "msg": "user updated sucessfully"
            });
        }
    });
 }
-});
-}
+
