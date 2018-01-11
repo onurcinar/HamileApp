@@ -37,17 +37,13 @@ export default class StepTwo extends React.Component {
             bDate:null,
             wState:null,
             eState:null,
-            rDate:null,
-            userTypes: [{userType: 'admin', userName: 'Admin User'}, {userType: 'employee', userName: 'Employee User'}, {userType: 'dev', userName: 'Developer User'}],
-            selectedUserType: '',
-            language:null,
-           // dsWorkStates: [{"id":2,"name":"Çalışıyor"},{"id":3,"name":"İşsiz"},{"id":4,"name":"Kararsız"}],
-         //   selectedWorkState: {"id":2,"name":"Çalışıyor"}
+            rDate:null
         }
     }
 
     componentDidMount() {
-        return fetch('http://192.168.2.104:5000/api/getWorkStates', {
+       // return fetch('http://192.168.2.104:5000/api/getWorkStates', {
+            return fetch('http://192.168.2.104:5000/api/getWorkAndSchoolStates', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -58,8 +54,12 @@ export default class StepTwo extends React.Component {
           .then((responseJson) => {
             this.setState({
               isLoading: false,
-              dsWorkStates: responseJson.results,
-              selectedWorkState:responseJson.results[0]
+              dsWorkStates: responseJson.workStates,
+             // selectedWorkState:responseJson.workStates[0],
+             selectedWorkState:null,
+              dsSchoolStates: responseJson.schoolStates,
+             // selectedWSchoolState:responseJson.schoolStates[0],
+             selectedSchoolState:null
             }, function() {
                // alert('key ='+accounts);
               // do something with new state
@@ -77,16 +77,17 @@ export default class StepTwo extends React.Component {
           <Picker.Item key={workState.id} label={workState.name} value={workState.id} />
        ))
       }
+
+      loadSchoolStates() {
+        return this.state.dsSchoolStates.map(schoolState => (
+            <Picker.Item key={schoolState.id} label={schoolState.name} value={schoolState.id} />
+         ))
+        }
+
     static navigationOptions = {
         header: null
     };
 
-    loadUserTypes() {
-        return this.state.userTypes.map(user => (
-           <Picker.Item key='1' label={user.userName} value={user.userType} />
-        ))
-      }
-      
     validate(bDate,wState,eState,rDate){
         if(bDate ==null) 
         {
@@ -185,32 +186,6 @@ var lang=this.state.language;
           }
         let winSize = Dimensions.get('window');
         //console.log(`width = ${winSize.width}`);
-        const workStateItems = []; 
-      //  for (var i = 0; i < this.state.dsWorkStates.length; i++) 
-       // { 
-         //   s = this.state.dsWorkStates[i]; 
-          //  alert('work state ='+s);
-           // workStateItems.push(<Picker.Item value={s} label={s} />);
-       //  }
-
-        let cData = [{
-            value: 'Çalışıyor',
-        }, {
-            value: 'İşsiz',
-        }, {
-            value: 'Kararsız',
-        }];
-        let oData = [{
-            value: 'İlkokul',
-        }, {
-            value: 'Ortaokul',
-        }, {
-            value: 'Lise',
-        }, {
-                value: 'Üniversite',
-        }, {
-            value: 'Yüksek Lisans',
-            }];
         return (
             <LinearGradient
                 colors={['#f6d1cc', '#d8ddee']}
@@ -219,10 +194,10 @@ var lang=this.state.language;
                 end={{ x: 1, y: 1 }}>
                 <ScrollView style={styles.scroll}>
                     <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', width: winSize.width - 30, marginTop: 30 }}>
-                        <ImageBackground style={{ width: 48, height: 48, marginTop: 20 }} source={require('../../images/8.png')} />
+                        <ImageBackground style={{ width: 48, height: 48}} source={require('../../images/8.png')} />
                         <Text style={[styles.textHeader, { marginTop: 10 }]}>  Hamile App</Text>
                         <Text style={{
-                            marginBottom: 20, textAlign: 'center', marginLeft: 30, marginRight: 20, marginTop: 20, color: 'grey',
+                            marginBottom: 20, textAlign: 'center', marginLeft: 30, marginRight: 20, marginTop: 10, color: 'grey',
                             fontStyle: 'italic', fontSize: 15
                         }}>
                             Sana dair bir kaç sorumuz var...
@@ -252,33 +227,27 @@ var lang=this.state.language;
                                 }}
                                 onDateChange={(bDate) => { this.setState({ bDate: bDate }) }}
                             />
-                            <Picker 
-                            selectedValue={this.state.language}
-                            onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-                            {/* <Picker.Item label="Java" value="1" />
-                            <Picker.Item label="JavaScript" value="2" /> */}
-                            {this.loadUserTypes()}
-                            </Picker>
-                            <Picker
-                                selectedValue={this.state.selectedWorkState}
-                                onValueChange={ (workState) => ( this.setState({selectedWorkState:workState}) ) } >
-                                  {this.loadWorkStates()}
-                            </Picker>
-                             <Dropdown style={{height:30}}
-                                label='Çalışma Durumu'
-                                data={cData}
-                                ref='drpWState'
-                                //value={wState}
-                                onChangeText={(wState) => this.setState({ wState })}
-                            /> 
-                            <Dropdown style={{ height: 30 }}
-                                label='Öğrenim Durumu'
-                                data={oData}
-                                ref='drpEState'
-                                //value={this.state.eState}
-                                onChangeText={(eState) => this.setState({ eState })}
-                            />
-                            <View style={{flex:1,flexDirection:'row', marginTop:20}}>
+                            <View style={{marginTop:20, height:60}}>
+                                <Text style={{minHeight:10, color:'grey'}} >Çalışma Durumu</Text>
+                                <View style={{marginTop:5, borderWidth:1, borderColor:'grey'}}>
+                                    <Picker style={{margin:0}}
+                                        selectedValue={this.state.selectedWorkState}
+                                        onValueChange={ (workState) => ( this.setState({selectedWorkState:workState}) ) } >
+                                        {this.loadWorkStates()}
+                                    </Picker>
+                                </View>
+                            </View>
+                            <View style={{marginTop:30, height:60}}>
+                                <Text style={{minHeight:10, color:'grey'}} >Öğrenim Durumu</Text>
+                                <View style={{marginTop:5, borderWidth:1, borderColor:'grey'}}>
+                                    <Picker
+                                        selectedValue={this.state.selectedSchoolState}
+                                        onValueChange={ (schoolState) => ( this.setState({selectedSchoolState:schoolState}) ) } >
+                                        {this.loadSchoolStates()}
+                                    </Picker>
+                                    </View>
+                            </View>
+                            <View style={{flex:1,flexDirection:'row', marginTop:30}}>
                                 <TouchableHighlight style={{ flex:1 }} underlayColor="white" onPress={()=>this.setBirthDate(1)} >
                                     <View >
                                         <Text style={{ color: 'white', backgroundColor:this.state.rBackgroundColor }}>Son Regle Tarihi</Text>
@@ -316,7 +285,7 @@ var lang=this.state.language;
                             />
                         </View>
                         <Button full rounded primary
-                            style={{ marginTop: 30, width: 70, alignSelf: 'center' }}
+                            style={{ marginTop: 15, width: 70, alignSelf: 'center' }}
                             onPress={this.submit.bind(this)}>
                             <Text>Devam Et</Text>
                         </Button>

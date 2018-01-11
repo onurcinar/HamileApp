@@ -25,5 +25,7 @@ router.post('/login', login.login);
 router.post('/protected', login.protected);
 router.post('/step2', login.step2);
 router.post('/getWorkStates',table.getWorkStates);
+router.post('/getWorkAndSchoolStates',table.getWorkAndSchoolStates);
+
 app.use('/api', router);
 app.listen(5000);
