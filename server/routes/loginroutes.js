@@ -144,7 +144,7 @@ exports.protected = function (req, res) {
 exports.step2 = function (req, res) {
     //console.log("req",req.body);
 
-   var sql = "UPDATE users SET bDate = "+req.body.bDate+", wState='"+req.body.wState+"', eState='"+req.body.eState+"', rDate="+req.body.rDate+" WHERE email = '"+req.body.email+"'";
+   var sql = "UPDATE users SET bDate = '"+req.body.bDate+"', wState="+req.body.wState+", sState="+req.body.eState+", rDate='"+req.body.rDate+"' WHERE email = '"+req.body.email+"'";
   console.log(sql);
    connection.query(sql, function (err, result) {
        if (err) {

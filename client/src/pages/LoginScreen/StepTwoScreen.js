@@ -42,8 +42,8 @@ export default class StepTwo extends React.Component {
     }
 
     componentDidMount() {
-       // return fetch('http://192.168.2.104:5000/api/getWorkStates', {
-            return fetch('http://192.168.2.104:5000/api/getWorkAndSchoolStates', {
+        return fetch('http://192.168.1.71:5000/api/getWorkAndSchoolStates', {
+          //  return fetch('http://192.168.2.104:5000/api/getWorkAndSchoolStates', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -55,11 +55,9 @@ export default class StepTwo extends React.Component {
             this.setState({
               isLoading: false,
               dsWorkStates: responseJson.workStates,
-             // selectedWorkState:responseJson.workStates[0],
-             selectedWorkState:null,
+             selectedWorkState:responseJson.workStates[0].id,
               dsSchoolStates: responseJson.schoolStates,
-             // selectedWSchoolState:responseJson.schoolStates[0],
-             selectedSchoolState:null
+             selectedSchoolState:responseJson.schoolStates[0].id
             }, function() {
                // alert('key ='+accounts);
               // do something with new state
@@ -116,19 +114,21 @@ export default class StepTwo extends React.Component {
         return true;
     }
 
-    submit = async () => {
+submit = async () => {
         var bDate=this.state.bDate;
-        var wState=this.state.wState;
-        var eState=this.state.eState;
+        var wState=this.state.selectedWorkState;
+        var eState=this.state.selectedSchoolState;
         var rDate=this.state.rDate;
         var email = await AsyncStorage.getItem('@HamAppStore:email');
-var lang=this.state.language;
-        alert('lang ='+lang+', ID='+langId);
-        return;
+        //alert('girdi esate='+eState+ 'wstate ='+wState);
+      //  alert('wsate ='+wState);
+       // alert('object =' +this.state.selectedWorkState);
+       // return;
        // alert('bdate ='+bDate+ ', wState ='+ wState+ ', eState ='+eState+', rDate ='+rDate);
         var result=this.validate(bDate,wState,eState,rDate);
         //alert('result ='+result);
        if(!result) return;
+      // alert('devam');
        const { navigate } = this.props.navigation;
           const data = {
             email:email,
@@ -139,8 +139,8 @@ var lang=this.state.language;
           }
           // Serialize and post the data
           const json = JSON.stringify(data);
-        // fetch('http://10.6.26.116:5000/api/step2', {
-          fetch('http://192.168.2.104:5000/api/step2', {
+         fetch('http://192.168.1.71:5000/api/step2', {
+         // fetch('http://192.168.2.104:5000/api/step2', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -166,6 +166,7 @@ var lang=this.state.language;
               alert('There was an error creating your account.' + error);
             })
             .done()
+           // alert('ok');
     }
     setBirthDate(value)
     {
