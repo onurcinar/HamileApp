@@ -24,6 +24,7 @@ router.post('/register', login.register);
 router.post('/login', login.login);
 router.post('/protected', login.protected);
 router.post('/step2', login.step2);
+router.post('/step3', login.step3);
 router.post('/getWorkStates',table.getWorkStates);
 router.post('/getWorkAndSchoolStates',table.getWorkAndSchoolStates);
 

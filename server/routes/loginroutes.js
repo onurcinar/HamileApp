@@ -144,7 +144,7 @@ exports.protected = function (req, res) {
 exports.step2 = function (req, res) {
     //console.log("req",req.body);
 
-   var sql = "UPDATE users SET bDate = '"+req.body.bDate+"', wState="+req.body.wState+", sState="+req.body.eState+", rDate='"+req.body.rDate+"' WHERE email = '"+req.body.email+"'";
+   var sql = "UPDATE users SET bDate = '"+req.body.bDate+"', wState="+req.body.wState+", sState="+req.body.eState+", rDate='"+req.body.rDate+"',regleValue="+req.body.rValue+" WHERE email = '"+req.body.email+"'";
   console.log(sql);
    connection.query(sql, function (err, result) {
        if (err) {
@@ -163,3 +163,25 @@ exports.step2 = function (req, res) {
    });
 }
 
+////step3
+exports.step3 = function (req, res) {
+    //console.log("req",req.body);
+
+   var sql = "UPDATE users SET babyName = '"+req.body.name+"', babySex="+req.body.sex+" WHERE email = '"+req.body.email+"'";
+  console.log(sql);
+   connection.query(sql, function (err, result) {
+       if (err) {
+           console.log("error ocurred", err);
+           res.send({
+               "code": 400,
+               "msg": "error ocurred"
+           })
+       } else {
+        console.log(result.affectedRows + " record(s) updated");
+           res.send({
+               "code": 200,
+               "msg": "user updated sucessfully"
+           });
+       }
+   });
+}

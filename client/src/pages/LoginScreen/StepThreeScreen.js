@@ -9,14 +9,15 @@ import {
     ScrollView,
     ImageBackground,
     TouchableHighlight,
-    Dimensions
+    Picker,
+    Dimensions,
+    AsyncStorage
 } from 'react-native';
 import { LinearGradient } from 'expo';
 import Container from '../../components/Container';
 import { Button } from "native-base";
 import Label from '../../components/Label';
 import DatePicker from 'react-native-datepicker';
-import { Dropdown } from 'react-native-material-dropdown';
 //import Icon from '@expo/vector-icons/FontAwesome';
 import Icon from '@expo/vector-icons/Entypo';
 import  KeyboardSpacer from 'react-native-keyboard-spacer';
@@ -24,32 +25,76 @@ export default class StepTwo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            date: null,
-            rBackgroundColor: 'blue',
-            bBackgroundColor: 'grey',
-            bText: 'Son Regle Tarihi'
+            selectedBabySex:0,
+            name:null
         }
     }
     static navigationOptions = {
         header: null
     };
-
-    setBirthDate(value) {
-        this.setState({
-            rBackgroundColor: value == 1 ? 'blue' : 'grey',
-            bBackgroundColor: value == 1 ? 'grey' : 'blue',
-            bText: value == 1 ? 'Son Regle Tarihi' : 'Beklenen Doğum Tarihi'
-        });
+    validate(name,sex){
+        if(name ==null || name=='') 
+        {
+           alert('Lütfen Bebeğin Adını Giriniz..');
+           this.refs.txtName.focus();
+           return false;
+        }
+        if(sex ==null ) 
+        {
+           alert('Lütfen Bebeğin Cinsiyetini Giriniz..');
+           return false;
+        }
+        return true;
     }
 
+    submit = async () => {
+        var name=this.state.name;
+        var sex=this.state.selectedBabySex;
+        var email = await AsyncStorage.getItem('@HamAppStore:email');
+     //  alert('sex ='+sex+', name='+name);
+      var result= this.validate(name,sex);
+      //alert('result ='+result);
+     if(!result) return;
+      const { navigate } = this.props.navigation;
+      const data = {
+        email:email,
+        name: name,
+        sex: sex
+      }
+      // Serialize and post the data
+      const json = JSON.stringify(data);
+    // fetch('http://192.168.1.71:5000/api/step3', {
+      fetch('http://192.168.1.139:5000/api/step3', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: json
+      })
+        .then((response) => response.json())
+        .then(async (res) => {
+            var code=res.code;
+            var result=res.msg;
+            if(code!=200)
+            {
+                alert(result);
+                return;
+            }
+          alert('Success! You may now log in.');
+          // Redirect to home screen
+          navigate("Profile");
+          //this.props.navigation.navigate.navigate("StepTwo");
+        })
+        .catch((error) => {
+          alert('There was an error creating your account.' + error);
+        })
+        .done()
+       // alert('ok');
+    }
     render() {
         let winSize = Dimensions.get('window');
         //console.log(`width = ${winSize.width}`);
-        let cData = [{
-            value: 'Erkek',
-        }, {
-            value: 'Kız',
-        }];
         
         return (
             <LinearGradient
@@ -68,17 +113,26 @@ export default class StepTwo extends React.Component {
                             Bebeğine dair bir kaç sorumuz var...
                          </Text>
                         <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-start', width: winSize.width - 60, }}>
-                           
-                            <Dropdown style={{ height: 30 }}
-                                label='Bebeğin Cinsiyeti'
-                                data={cData}
-                            />
-                            <TextInput underlineColorAndroid={'transparent'} placeholder="Bebeğin İsmi"
-                                style={styles.textInput} />
+                        <View style={{marginTop:20, height:60}}>
+                                <Text style={{minHeight:10, color:'grey'}} >Bebeğin Cinsiyeti</Text>
+                                <View style={{marginTop:5, borderWidth:1, borderColor:'grey'}}>
+                                    <Picker style={{margin:0}}
+                                        selectedValue={this.state.selectedBabySex}
+                                        onValueChange={ (babySex) => ( this.setState({selectedBabySex:babySex}) ) } >
+                                        <Picker.Item key='0' label='Kız' value='0' />
+                                        <Picker.Item key='1' label='Erkek' value='1' />
+                                    </Picker>
+                                </View>
+                            </View>
+                            <TextInput ref='txtName' keyboardType={'default'}
+                                onChangeText={(name) => this.setState({ name })}
+                                value={this.state.name}
+                         underlineColorAndroid={'transparent'} placeholder="Bebeğin İsmi" 
+                            style={styles.textInput} />
                         </View>
                         <Button full rounded primary
                             style={{ marginTop: 30, width: 70, alignSelf: 'center' }}
-                            onPress={() => this.props.navigation.navigate("Profile")}>
+                            onPress={this.submit.bind(this)}>
                             <Text>Tamamla</Text>
                         </Button>
 
@@ -110,7 +164,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'grey',
         height: 30,
-        marginTop: 20
+        marginTop: 30
     }
 });
 

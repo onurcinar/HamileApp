@@ -19,7 +19,6 @@ import Container from '../../components/Container';
 import { Button } from "native-base";
 import Label from '../../components/Label';
 import DatePicker from 'react-native-datepicker';
-import { Dropdown } from 'react-native-material-dropdown';
 //import Icon from '@expo/vector-icons/FontAwesome';
 import Icon from '@expo/vector-icons/Entypo';
 import  KeyboardSpacer from 'react-native-keyboard-spacer';
@@ -34,6 +33,7 @@ export default class StepTwo extends React.Component {
             rBackgroundColor:'blue',
             bBackgroundColor: 'grey',
             bText:'Son Regle Tarihi',
+            regleValue:0,
             bDate:null,
             wState:null,
             eState:null,
@@ -42,8 +42,8 @@ export default class StepTwo extends React.Component {
     }
 
     componentDidMount() {
-        return fetch('http://192.168.1.71:5000/api/getWorkAndSchoolStates', {
-          //  return fetch('http://192.168.2.104:5000/api/getWorkAndSchoolStates', {
+        //return fetch('http://192.168.1.71:5000/api/getWorkAndSchoolStates', {
+            return fetch('http://192.168.1.170:5000/api/getWorkAndSchoolStates', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -119,6 +119,7 @@ submit = async () => {
         var wState=this.state.selectedWorkState;
         var eState=this.state.selectedSchoolState;
         var rDate=this.state.rDate;
+        var rValue=this.state.regleValue;
         var email = await AsyncStorage.getItem('@HamAppStore:email');
         //alert('girdi esate='+eState+ 'wstate ='+wState);
       //  alert('wsate ='+wState);
@@ -135,12 +136,13 @@ submit = async () => {
             bDate: bDate,
             wState: wState,
             eState: eState,
-            rDate: rDate
+            rDate: rDate,
+            rValue:rValue
           }
           // Serialize and post the data
           const json = JSON.stringify(data);
-         fetch('http://192.168.1.71:5000/api/step2', {
-         // fetch('http://192.168.2.104:5000/api/step2', {
+        // fetch('http://192.168.1.71:5000/api/step2', {
+          fetch('http://192.168.1.170:5000/api/step2', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -173,7 +175,8 @@ submit = async () => {
         this.setState({
             rBackgroundColor:value==1?'blue':'grey',
             bBackgroundColor: value == 1 ? 'grey' : 'blue',
-            bText: value == 1 ? 'Son Regle Tarihi' :'Beklenen Doğum Tarihi'
+            bText: value == 1 ? 'Son Regle Tarihi' :'Beklenen Doğum Tarihi',
+            regleValue:value == 1 ?0:1
         });
     }
 
