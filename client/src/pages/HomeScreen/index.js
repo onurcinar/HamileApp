@@ -7,7 +7,7 @@ import Login from "../LoginScreen/index.js";
 import { DrawerNavigator } from "react-navigation";
 const HomeScreenRouter = DrawerNavigator(
   {
-    Home: { screen: Login },
+    Home: { screen: HomeScreen },
     Chat: { screen: MainScreenNavigator },
     Profile: { screen: Profile },
     Login: {screen:Login}

@@ -1,6 +1,7 @@
 var express = require("express");
 var login = require('./routes/loginroutes');
 var table =require('./routes/tableroutes');
+var user =require('./routes/userroutes');
 var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,6 +28,6 @@ router.post('/step2', login.step2);
 router.post('/step3', login.step3);
 router.post('/getWorkStates',table.getWorkStates);
 router.post('/getWorkAndSchoolStates',table.getWorkAndSchoolStates);
-
+router.post('/getUser',user.getUser);
 app.use('/api', router);
 app.listen(5000);

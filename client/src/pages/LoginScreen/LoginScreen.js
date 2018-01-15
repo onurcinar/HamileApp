@@ -19,7 +19,7 @@ import Label from '../../components/Label';
 import Icon from '@expo/vector-icons/Entypo';
 //import InputValidation from 'react-native-input-validation';
 import  KeyboardSpacer from 'react-native-keyboard-spacer';
-export default class FormTest2 extends React.Component {
+export default class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
